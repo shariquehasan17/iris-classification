@@ -1,0 +1,39 @@
+sns.set(style="whitegrid")
+
+sns.pairplot(df, hue='species', diag_kind='hist')
+plt.suptitle("Pairplot of Iris features", y=1.02)
+plt.show()
+
+plt.figure(figsize=(6,5))
+corr = df.iloc[:, :4].corr()
+sns.heatmap(corr, annot=True, fmt=".2f")
+plt.title("Feature Correlation Matrix")
+plt.show()
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+features = df.columns[:4]
+for ax, feat in zip(axes.flatten(), features):
+    sns.boxplot(x='species', y=feat, data=df, ax=ax)
+    ax.set_title(f"{feat} by species")
+plt.tight_layout()
+plt.show()
+
+
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.model_selection import train_test_split
+
+X = df.iloc[:, :4].values            
+y = df['species'].values             
+
+le = LabelEncoder()
+y_encoded = le.fit_transform(y)      
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded
+)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+print("Train shape:", X_train.shape, "Test shape:", X_test.shape)
