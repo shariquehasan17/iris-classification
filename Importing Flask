@@ -1,0 +1,33 @@
+from flask import Flask, request, jsonify
+import joblib
+import numpy as np
+
+app = Flask(__name__)
+
+model = joblib.load("iris_model.joblib")
+scaler = joblib.load("iris_scaler.joblib")
+le = joblib.load("iris_label_encoder.joblib")
+
+@app.route("/")
+def index():
+    return "Iris classification API. POST to /predict with JSON {'features': [sepal_len, sepal_wid, petal_len, petal_wid]}"
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    data = request.get_json(force=True)
+    features = data.get("features", None)
+    if features is None or len(features) != 4:
+        return jsonify({"error": "Provide 'features': [slen, swid, plen, pwid]"}), 400
+    features = np.array(features).reshape(1, -1)
+    scaled = scaler.transform(features)
+    pred_idx = model.predict(scaled)[0]
+    pred_label = le.inverse_transform([int(pred_idx)])[0]
+    return jsonify({"prediction": str(pred_label)})
+
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=False) 
+
+
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"features": [5.1, 3.5, 1.4, 0.2]}' \
+  http://127.0.0.1:5000/predict
