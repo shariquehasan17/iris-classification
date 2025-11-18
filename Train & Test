@@ -1,0 +1,35 @@
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
+
+knn = KNeighborsClassifier(n_neighbors=3)
+knn.fit(X_train_scaled, y_train)
+y_pred_knn = knn.predict(X_test_scaled)
+
+print("KNN Accuracy:", accuracy_score(y_test, y_pred_knn))
+print("\nClassification report:\n", classification_report(y_test, y_pred_knn, target_names=le.classes_))
+cm = confusion_matrix(y_test, y_pred_knn)
+sns.heatmap(cm, annot=True, fmt='d', xticklabels=le.classes_, yticklabels=le.classes_)
+plt.xlabel('Predicted'); plt.ylabel('True'); plt.title('KNN Confusion Matrix')
+plt.show()
+
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.model_selection import cross_val_score
+
+models = {
+    'LogisticRegression': LogisticRegression(max_iter=200),
+    'DecisionTree': DecisionTreeClassifier(random_state=42),
+    'RandomForest': RandomForestClassifier(n_estimators=100, random_state=42),
+    'SVM': SVC(),
+    'KNN': KNeighborsClassifier(n_neighbors=3)
+}
+
+X_all_scaled = scaler.fit_transform(X) 
+cv_results = {}
+for name, model in models.items():
+    scores = cross_val_score(model, X_all_scaled, y_encoded, cv=5, scoring='accuracy')
+    cv_results[name] = (scores.mean(), scores.std())
+    print(f"{name}: CV accuracy = {scores.mean():.4f} ± {scores.std():.4f}")
