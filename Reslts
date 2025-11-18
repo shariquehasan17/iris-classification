@@ -1,0 +1,62 @@
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+best_rf = gs_rf.best_estimator_
+best_svc = gs_svc.best_estimator_
+
+y_pred_rf = best_rf.predict(X_test)  
+print("Random Forest Test Accuracy:", accuracy_score(y_test, y_pred_rf))
+print(classification_report(y_test, y_pred_rf, target_names=le.classes_))
+sns.heatmap(confusion_matrix(y_test, y_pred_rf), annot=True, fmt='d', xticklabels=le.classes_, yticklabels=le.classes_)
+plt.title("Random Forest Confusion Matrix")
+plt.show()
+
+y_pred_svc = best_svc.predict(X_test_scaled)
+print("SVC Test Accuracy:", accuracy_score(y_test, y_pred_svc))
+print(classification_report(y_test, y_pred_svc, target_names=le.classes_))
+sns.heatmap(confusion_matrix(y_test, y_pred_svc), annot=True, fmt='d', xticklabels=le.classes_, yticklabels=le.classes_)
+plt.title("SVC Confusion Matrix")
+plt.show()
+Random Forest Test Accuracy: 0.9666666666666667
+              precision    recall  f1-score   support
+
+      setosa       1.00      1.00      1.00        10
+  versicolor       1.00      0.90      0.95        10
+   virginica       0.91      1.00      0.95        10
+
+    accuracy                           0.97        30
+   macro avg       0.97      0.97      0.97        30
+weighted avg       0.97      0.97      0.97        30
+
+SVC Test Accuracy: 0.9333333333333333
+              precision    recall  f1-score   support
+
+      setosa       1.00      1.00      1.00        10
+  versicolor       0.90      0.90      0.90        10
+   virginica       0.90      0.90      0.90        10
+
+    accuracy                           0.93        30
+   macro avg       0.93      0.93      0.93        30
+weighted avg       0.93      0.93      0.93        30
+
+
+importances = best_rf.feature_importances_
+for feat, imp in zip(data['feature_names'], importances):
+    print(f"{feat}: {imp:.4f}")
+
+plt.bar(data['feature_names'], importances)
+plt.title("Feature importances (Random Forest)")
+plt.xticks(rotation=45)
+plt.show()
+
+from sklearn.decomposition import PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(scaler.fit_transform(X))  
+pca_df = pd.DataFrame(X_pca, columns=['PC1','PC2'])
+pca_df['species'] = df['species'].values
+sns.scatterplot(data=pca_df, x='PC1', y='PC2', hue='species', s=80)
+plt.title("PCA projection of Iris dataset")
+plt.show()
+sepal length (cm): 0.1143
+sepal width (cm): 0.0060
+petal length (cm): 0.4442
+petal width (cm): 0.4355
